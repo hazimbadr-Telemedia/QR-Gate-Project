@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vCard Generator - Holool Med</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6fa3ef;
+            --gradient-1: #667eea;
+            --gradient-2: #764ba2;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            position: relative;
+        }
+
+        /* Animated Background */
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 20%;
+            animation-delay: -10s;
+        }
+
+        .shape:nth-child(4) {
+            width: 180px;
+            height: 180px;
+            top: 20%;
+            left: 70%;
+            animation-delay: -15s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-20px) rotate(90deg);
+            }
+            50% {
+                transform: translateY(0) rotate(180deg);
+            }
+            75% {
+                transform: translateY(20px) rotate(270deg);
+            }
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 35px;
+            font-weight: 700;
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* vCard Final Design */
+        .vcard-final {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 30px auto;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+            animation: cardAppear 0.6s ease-out;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .logo-section {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .final-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .profile-section {
+            margin-top: 50px;
+            margin-bottom: 30px;
+        }
+
+        .final-profile-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin: 0 auto 25px;
+            transition: all 0.3s ease;
+        }
+
+        .final-profile-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .name-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .job-title {
+            color: #667eea;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+
+        .contact-info {
+            text-align: left;
+            margin-bottom: 30px;
+            background: rgba(102, 126, 234, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .contact-info p {
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .contact-info a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #764ba2;
+        }
+
+        .action-buttons {
+            margin-bottom: 30px;
+        }
+
+        .btn-success, .btn-secondary {
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #868e96);
+        }
+
+        .btn-success:hover, .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .qr-section {
+            border-top: 2px solid rgba(102, 126, 234, 0.1);
+            padding-top: 25px;
+        }
+
+        .qr-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .qr-note {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        /* File input styling */
+        .file-input-group {
+            position: relative;
+        }
+
+        .file-input-group input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            text-align: center;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-input-label:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container, .vcard-final {
+                margin: 20px;
+                padding: 25px;
+            }
+            
+            .form-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h2 class="form-title">Create Your Digital vCard</h2>
+        
+        <form id="employeeForm">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="fullName" class="form-label">👤 Full Name</label>
+                    <input type="text" class="form-control" id="fullName" name="fullName" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <label for="jobTitle" class="form-label">💼 Job Title</label>
+                    <input type="text" class="form-control" id="jobTitle" name="jobTitle" required placeholder="Your position">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="company" class="form-label">🏢 Company</label>
+                    <input type="text" class="form-control" id="company" name="company" required value="Holool Med">
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <label for="phone" class="form-label">📞 Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" required placeholder="+20 XXX XXX XXXX">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="email" class="form-label">✉️ Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" required placeholder="your.email@company.com">
+            </div>
+
+            <div class="mb-4">
+                <label for="linkedin" class="form-label">🔗 LinkedIn Profile</label>
+                <input type="url" class="form-control" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/yourprofile">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label class="form-label">🖼️ Profile Photo</label>
+                    <div class="file-input-group">
+                        <input type="file" class="form-control" id="profilePicture" name="profilePicture" accept="image/*" required>
+                        <label for="profilePicture" class="file-input-label">Choose Profile Photo</label>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <label class="form-label">🏢 Company Logo</label>
+                    <div class="file-input-group">
+                        <input type="file" class="form-control" id="companyLogo" name="companyLogo" accept="image/*">
+                        <label for="companyLogo" class="file-input-label">Choose Company Logo</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                🎨 Generate Digital vCard
+            </button>
+        </form>
+    </div>
+
+    <!-- Result Card -->
+    <div id="vcardOutput" style="display: none;"></div>
+
+    <script>
+        document.getElementById('employeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateVCard();
+        });
+
+        function generateVCard() {
+            const fullName = document.getElementById('fullName').value;
+            const jobTitle = document.getElementById('jobTitle').value;
+            const company = document.getElementById('company').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const linkedin = document.getElementById('linkedin').value;
+
+            const profileFile = document.getElementById('profilePicture').files[0];
+            const logoFile = document.getElementById('companyLogo').files[0];
+
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const profileBase64 = e.target.result;
+                
+                if (logoFile) {
+                    const logoReader = new FileReader();
+                    logoReader.onload = function(e) {
+                        const logoBase64 = e.target.result;
+                        showFinalVCard(fullName, jobTitle, company, phone, email, linkedin, profileBase64, logoBase64);
+                    };
+                    logoReader.readAsDataURL(logoFile);
+                } else {
+                    showFinalVCard(fullName, jobTitle, company, phone, email, linkedin, profileBase64, null);
+                }
+            };
+            
+            if (profileFile) {
+                reader.readAsDataURL(profileFile);
+            } else {
+                showFinalVCard(fullName, jobTitle, company, phone, email, linkedin, null, null);
+            }
+        }
+
+        function showFinalVCard(fullName, jobTitle, company, phone, email, linkedin, profileBase64, logoBase64) {
+            document.querySelector('.form-container').style.display = 'none';
+            
+            const finalCard = `
+                <div class="vcard-final">
+                    <!-- Logo Section - Positioned at top -->
+                    ${logoBase64 ? `
+                        <div class="logo-section">
+                            <img src="${logoBase64}" alt="Company Logo" class="final-logo">
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Profile Section -->
+                    <div class="profile-section">
+                        ${profileBase64 ? 
+                            `<img src="${profileBase64}" alt="${fullName}" class="final-profile-img">` : 
+                            '<div class="final-profile-img bg-secondary d-flex align-items-center justify-content-center text-white">No Image</div>'
+                        }
+                        
+                        <h2 class="name-title">${fullName}</h2>
+                        <div class="job-title">${jobTitle}</div>
+                    </div>
+                    
+                    <!-- Contact Information -->
+                    <div class="contact-info">
+                        <p><strong>🏢 Company:</strong> ${company}</p>
+                        <p><strong>📞 Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
+                        <p><strong>✉️ Email:</strong> <a href="mailto:${email}">${email}</a></p>
+                        ${linkedin ? `<p><strong>🔗 LinkedIn:</strong> <a href="${linkedin}" target="_blank">View Profile</a></p>` : ''}
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons row">
+                        <div class="col-6">
+                            <button onclick="downloadVCF()" class="btn btn-success w-100">
+                                📇 Save Contact
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button onclick="window.location.reload()" class="btn btn-secondary w-100">
+                                🆕 Create New
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code Section -->
+                    <div class="qr-section">
+                        <h5 class="qr-title">📲 Scan to Connect</h5>
+                        <div id="qrcode"></div>
+                        <p class="qr-note">Scan QR code to save contact information</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('vcardOutput').innerHTML = finalCard;
+            document.getElementById('vcardOutput').style.display = 'block';
+
+            generateQRCode(fullName, jobTitle, company, phone, email, linkedin);
+        }
+
+        function generateQRCode(fullName, jobTitle, company, phone, email, linkedin) {
+            const qrElement = document.getElementById('qrcode');
+            qrElement.innerHTML = '';
+            
+            const vcardData = `
+BEGIN:VCARD
+VERSION:3.0
+FN:${fullName}
+TEL:${phone}
+EMAIL:${email}
+TITLE:${jobTitle}
+ORG:${company}
+${linkedin ? `URL:${linkedin}` : ''}
+NOTE:Generated by Holool Med vCard System
+END:VCARD
+            `.trim();
+            
+            new QRCode(qrElement, {
+                text: vcardData,
+                width: 160,
+                height: 160,
+                colorDark: "#2c3e50",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            window.currentVCardData = vcardData;
+            window.currentFileName = `${fullName.replace(/\s+/g, '_')}.vcf`;
+        }
+
+        function downloadVCF() {
+            if (!window.currentVCardData) return;
+            
+            const blob = new Blob([window.currentVCardData], { type: 'text/vcard;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = window.currentFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Add file input change events to show file names
+        document.getElementById('profilePicture').addEventListener('change', function(e) {
+            const label = this.nextElementSibling;
+            if (this.files.length > 0) {
+                label.textContent = this.files[0].name;
+                label.style.borderColor = '#28a745';
+                label.style.background = 'rgba(40, 167, 69, 0.1)';
+            }
+        });
+
+        document.getElementById('companyLogo').addEventListener('change', function(e) {
+            const label = this.nextElementSibling;
+            if (this.files.length > 0) {
+                label.textContent = this.files[0].name;
+                label.style.borderColor = '#007bff';
+                label.style.background = 'rgba(0, 123, 255, 0.1)';
+            }
+        });
+    </script>
+</body>
+</html>
