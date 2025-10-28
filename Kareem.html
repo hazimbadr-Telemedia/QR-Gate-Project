@@ -34,14 +34,16 @@
       margin-bottom: 15px;
     }
 
-    /* Profile Image */
-    .profile-img {
-      width: 130px;
-      height: 130px;
+    /* Profile Image - Improved */
+    .profile-photo {
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       object-fit: cover;
-      margin-bottom: 15px;
+      margin: 0 auto 15px;
       border: 4px solid #007bff;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      display: block;
     }
 
     .info h3 {
@@ -83,6 +85,11 @@
       color: #57a6ff;
     }
 
+    body.dark .profile-photo {
+      border-color: #57a6ff;
+      box-shadow: 0 4px 12px rgba(87, 166, 255, 0.3);
+    }
+
     /* Floating background circles */
     .circle {
       position: absolute;
@@ -107,17 +114,16 @@
 
   <div class="card" id="profileCard">
     <!-- Logo -->
-   <a href="https://www.telemediamisr.com/" target="_blank">
-  <img src="logo.jpg" alt="Telemedia Logo" class="logo">
-</a>
+    <a href="https://www.telemediamisr.com/" target="_blank">
+      <img src="logo.jpg" alt="Telemedia Logo" class="logo">
+    </a>
 
-    <!-- Profile Image -->
- <img src="kareem.jpg" alt="Kareem Abdullah" class="profile-photo"> 
-
+    <!-- Profile Image - Improved -->
+    <img src="kareem.jpg" alt="Kareem Abdullah" class="profile-photo">
 
     <div class="info">
-      <h3>👤 Name:Kareem Abdullah </h3>
-      <p>💼 Title:Information Technology Manger</p>
+      <h3>👤 Name: Kareem Abdullah</h3>
+      <p>💼 Title: Information Technology Manager</p>
       <p>🏢 Company: Telemediamisr</p>
       <p>📞 Phone: <a href="tel:01000021832">01000021832</a></p>
       <p>✉️ Email: <a href="mailto:Kareem.Mohsen@telemediamisr.com">Kareem.Mohsen@telemediamisr.com</a></p>
@@ -148,5 +154,3 @@
   </script>
 </body>
 </html>
-
-
