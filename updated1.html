@@ -143,7 +143,44 @@
             border-radius: 2px;
         }
 
-        /* vCard Final Design - UPDATED */
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* vCard Final Design */
         .vcard-final {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -170,17 +207,17 @@
             }
         }
 
-        /* UPDATED Logo Section - Bigger and Better */
+        /* UPDATED Logo Section - اللوجو هيظهر باللون الأصلي */
         .logo-section {
             position: absolute;
             top: -50px;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: white;
             padding: 20px 30px;
             border-radius: 60px;
-            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
-            border: 3px solid white;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            border: 3px solid #f8f9fa;
             z-index: 10;
         }
 
@@ -188,7 +225,7 @@
             width: 100px;
             height: 80px;
             object-fit: contain;
-            filter: brightness(0) invert(1); /* نخلي اللوجو أبيض */
+            /* اللوجو هيفضل باللون الأصلي */
         }
 
         .profile-section {
@@ -301,7 +338,27 @@
             margin-top: 10px;
         }
 
-        /* باقي الـ CSS زي ما هو */
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container, .vcard-final {
+                margin: 20px;
+                padding: 25px;
+            }
+            
+            .form-title {
+                font-size: 1.8rem;
+            }
+            
+            .logo-section {
+                top: -40px;
+                padding: 15px 25px;
+            }
+            
+            .final-logo {
+                width: 80px;
+                height: 60px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -364,7 +421,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-3" style="background: linear-gradient(135deg, #667eea, #764ba2); border: none; font-size: 1.1rem;">
+            <button type="submit" class="btn btn-primary w-100 py-3">
                 🎨 Generate Digital vCard
             </button>
         </form>
@@ -390,7 +447,6 @@
             const profileFile = document.getElementById('profilePicture').files[0];
             const logoFile = document.getElementById('companyLogo').files[0];
 
-            // نتحقق من وجود الصورة الشخصية
             if (!profileFile) {
                 alert("Please upload a profile photo!");
                 return;
@@ -409,7 +465,6 @@
                     };
                     logoReader.readAsDataURL(logoFile);
                 } else {
-                    // لو مفيش لوجو، نعرض اسم الشركة بدل ما نفضل المكان فاضي
                     showFinalVCard(fullName, jobTitle, company, phone, email, linkedin, profileBase64, null);
                 }
             };
@@ -422,18 +477,16 @@
             
             const finalCard = `
                 <div class="vcard-final">
-                    <!-- Logo Section - UPDATED -->
                     ${logoBase64 ? `
                         <div class="logo-section">
                             <img src="${logoBase64}" alt="${company} Logo" class="final-logo">
                         </div>
                     ` : `
-                        <div class="logo-section" style="background: linear-gradient(135deg, #28a745, #20c997);">
-                            <h4 class="mb-0 text-white">${company}</h4>
+                        <div class="logo-section">
+                            <h4 class="mb-0 text-dark">${company}</h4>
                         </div>
                     `}
                     
-                    <!-- Profile Section -->
                     <div class="profile-section">
                         <img src="${profileBase64}" alt="${fullName}" class="final-profile-img">
                         
@@ -441,7 +494,6 @@
                         <div class="job-title">${jobTitle}</div>
                     </div>
                     
-                    <!-- Contact Information -->
                     <div class="contact-info">
                         <p><strong>🏢 Company:</strong> ${company}</p>
                         <p><strong>📞 Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
@@ -449,7 +501,6 @@
                         ${linkedin ? `<p><strong>🔗 LinkedIn:</strong> <a href="${linkedin}" target="_blank">View Profile</a></p>` : ''}
                     </div>
                     
-                    <!-- Action Buttons -->
                     <div class="action-buttons row">
                         <div class="col-6">
                             <button onclick="downloadVCF()" class="btn btn-success w-100">
@@ -463,7 +514,6 @@
                         </div>
                     </div>
                     
-                    <!-- QR Code Section -->
                     <div class="qr-section">
                         <h5 class="qr-title">📲 Scan to Connect</h5>
                         <div id="qrcode"></div>
@@ -475,7 +525,6 @@
             document.getElementById('vcardOutput').innerHTML = finalCard;
             document.getElementById('vcardOutput').style.display = 'block';
 
-            // ننشئ الـ QR code
             generateQRCode(fullName, jobTitle, company, phone, email, linkedin);
         }
 
@@ -483,7 +532,6 @@
             const qrElement = document.getElementById('qrcode');
             qrElement.innerHTML = '';
             
-            // ننشئ محتوى الـ vCard
             const vcardData = `
 BEGIN:VCARD
 VERSION:3.0
@@ -497,7 +545,6 @@ NOTE:Generated by Holool Med vCard System
 END:VCARD
             `.trim();
             
-            // ننشئ الـ QR code
             try {
                 new QRCode(qrElement, {
                     text: vcardData,
@@ -512,7 +559,6 @@ END:VCARD
                 qrElement.innerHTML = '<p class="text-danger">QR Code generation failed</p>';
             }
 
-            // نحفظ البيانات للتحميل
             window.currentVCardData = vcardData;
             window.currentFileName = `${fullName.replace(/\s+/g, '_')}.vcf`;
         }
